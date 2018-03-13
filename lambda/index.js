@@ -8,7 +8,7 @@ const Sharp = require('sharp');
 
 const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
-const ALLOWED_WIDTHS = new Set(600, 300);
+const ALLOWED_WIDTHS = new Set([ 600, 300 ]);
 
 exports.handler = function(event, context, callback) {
   const key = event.queryStringParameters.key;

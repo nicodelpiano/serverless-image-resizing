@@ -8,8 +8,7 @@ const Sharp = require('sharp');
 
 const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
-const ALLOWED_WIDTHS = new Set();
-
+const ALLOWED_WIDTHS = new Set(600, 300);
 
 exports.handler = function(event, context, callback) {
   const key = event.queryStringParameters.key;
@@ -17,7 +16,7 @@ exports.handler = function(event, context, callback) {
   const width = parseInt(match[1], 10);
   const originalKey = match[2];
 
-  if(ALLOWED_WIDTHS.size > 0 && !ALLOWED_WIDTHS.has(width.toString())) {
+  if(ALLOWED_WIDTHS.size > 0 && !ALLOWED_WIDTHS.has(width)) {
      callback(null, {
       statusCode: '403',
       headers: {},
@@ -36,6 +35,7 @@ exports.handler = function(event, context, callback) {
         Body: buffer,
         Bucket: BUCKET,
         ContentType: 'image/jpeg',
+        CacheControl: `max-age=31536000`,
         Key: key,
       }).promise()
     )

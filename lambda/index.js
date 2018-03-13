@@ -8,22 +8,16 @@ const Sharp = require('sharp');
 
 const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
-const ALLOWED_DIMENSIONS = new Set();
+const ALLOWED_WIDTHS = new Set();
 
-if (process.env.ALLOWED_DIMENSIONS) {
-  const dimensions = process.env.ALLOWED_DIMENSIONS.split(/\s*,\s*/);
-  dimensions.forEach((dimension) => ALLOWED_DIMENSIONS.add(dimension));
-}
 
 exports.handler = function(event, context, callback) {
   const key = event.queryStringParameters.key;
-  const match = key.match(/((\d+)x(\d+))\/(.*)/);
-  const dimensions = match[1];
-  const width = parseInt(match[2], 10);
-  const height = parseInt(match[3], 10);
-  const originalKey = match[4];
+  const match = key.match(/(\d+)\/(.*)/);
+  const width = parseInt(match[1], 10);
+  const originalKey = match[2];
 
-  if(ALLOWED_DIMENSIONS.size > 0 && !ALLOWED_DIMENSIONS.has(dimensions)) {
+  if(ALLOWED_WIDTHS.size > 0 && !ALLOWED_WIDTHS.has(width.toString())) {
      callback(null, {
       statusCode: '403',
       headers: {},
@@ -34,14 +28,14 @@ exports.handler = function(event, context, callback) {
 
   S3.getObject({Bucket: BUCKET, Key: originalKey}).promise()
     .then(data => Sharp(data.Body)
-      .resize(width, height)
-      .toFormat('png')
+      .resize(width, null)
+      .toFormat('jpg')
       .toBuffer()
     )
     .then(buffer => S3.putObject({
         Body: buffer,
         Bucket: BUCKET,
-        ContentType: 'image/png',
+        ContentType: 'image/jpeg',
         Key: key,
       }).promise()
     )

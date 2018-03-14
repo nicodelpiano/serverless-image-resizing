@@ -7,7 +7,7 @@ const S3 = new AWS.S3({
 const Sharp = require('sharp');
 
 const BUCKET = process.env.BUCKET;
-const URL = process.env.URL;
+const URL = process.env.URL; // Bucket public URL
 const ALLOWED_WIDTHS = new Set([ 600, 300 ]);
 
 exports.handler = function(event, context, callback) {

@@ -27,6 +27,7 @@ exports.handler = function(event, context, callback) {
 
   S3.getObject({Bucket: BUCKET, Key: originalKey}).promise()
     .then(data => Sharp(data.Body)
+      .rotate()          // jpegs can store rotation data in the exif data without rotating the image, but after the resizing the exif data is being stripped off and the image ends-up with an incorrect orientation
       .resize(width)
       .toFormat('jpeg')
       .toBuffer()
